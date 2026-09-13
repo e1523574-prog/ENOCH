@@ -553,7 +553,7 @@ rsvpForm.addEventListener(
         */
 
         const number =
-            "233XXXXXXXXX";
+            "233545958975";
 
 
         const text =
