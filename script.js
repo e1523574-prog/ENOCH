@@ -320,10 +320,7 @@ document.addEventListener(
    WEDDING DATE.
 */
 
-const weddingDate =
-    new Date(
-        "2026-09-26T13:00:00+00:00"
-    ).getTime();
+const weddingDate = new Date("2026-11-21T13:00:00+00:00").getTime();
 
 
 
