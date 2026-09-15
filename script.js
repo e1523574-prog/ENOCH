@@ -1,119 +1,25 @@
-/* =====================================================
+/* =========================================================
+   WEDDING WEBSITE JAVASCRIPT
+========================================================= */
+
+
+/* =========================================================
    MOBILE NAVIGATION
-===================================================== */
+========================================================= */
 
-const header = document.getElementById("header");
-const menuToggle = document.getElementById("menuToggle");
-const nav = document.getElementById("nav");
+const menuToggle = document.querySelector(".menu-toggle");
+const mainNav = document.querySelector(".main-nav");
 
+if (menuToggle && mainNav) {
 
-window.addEventListener("scroll", () => {
-
-    if (window.scrollY > 40) {
-
-        header.classList.add("scrolled");
-
-    } else {
-
-        header.classList.remove("scrolled");
-
-    }
-
-});
-
-
-menuToggle.addEventListener("click", () => {
-
-    nav.classList.toggle("open");
-
-});
-
-
-nav.querySelectorAll("a").forEach(link => {
-
-    link.addEventListener("click", () => {
-
-        nav.classList.remove("open");
-
+    menuToggle.addEventListener("click", () => {
+        mainNav.classList.toggle("active");
     });
 
-});
+    document.querySelectorAll(".main-nav a").forEach(link => {
 
-
-
-/* =====================================================
-   HERO SLIDESHOW
-===================================================== */
-
-const slides = [
-    ...document.querySelectorAll(".hero-slide")
-];
-
-const currentSlide =
-    document.getElementById("currentSlide");
-
-const totalSlides =
-    document.getElementById("totalSlides");
-
-const progressBar =
-    document.getElementById("progressBar");
-
-
-let slideIndex = 0;
-
-const slideDuration = 5000;
-
-let slideshowTimer;
-
-
-
-totalSlides.textContent =
-    String(slides.length).padStart(2, "0");
-
-
-
-/* Show slide */
-
-function showSlide(index) {
-
-    slideIndex =
-        (index + slides.length) % slides.length;
-
-
-    slides.forEach((slide, i) => {
-
-        slide.classList.toggle(
-            "active",
-            i === slideIndex
-        );
-
-    });
-
-
-    currentSlide.textContent =
-        String(slideIndex + 1).padStart(2, "0");
-
-
-    /*
-       Restart progress animation
-    */
-
-    progressBar.style.transition = "none";
-
-    progressBar.style.width =
-        `${(slideIndex / slides.length) * 100}%`;
-
-
-    requestAnimationFrame(() => {
-
-        requestAnimationFrame(() => {
-
-            progressBar.style.transition =
-                `width ${slideDuration}ms linear`;
-
-            progressBar.style.width =
-                `${((slideIndex + 1) / slides.length) * 100}%`;
-
+        link.addEventListener("click", () => {
+            mainNav.classList.remove("active");
         });
 
     });
@@ -121,278 +27,201 @@ function showSlide(index) {
 }
 
 
+/* =========================================================
+   HERO SLIDESHOW
+========================================================= */
 
-/* Next slide */
+const slides = document.querySelectorAll(".hero-slide");
+const slideCurrent = document.getElementById("slideCurrent");
+const slideTotal = document.getElementById("slideTotal");
+const slideProgress = document.getElementById("slideProgress");
 
-function nextSlide() {
+let currentSlide = 0;
+let slideTimer;
 
-    showSlide(slideIndex + 1);
+const slideDuration = 5000;
 
-}
+if (slides.length > 0) {
 
+    slideTotal.textContent = String(slides.length).padStart(2, "0");
 
+    function showSlide(index) {
 
-/* Previous slide */
+        slides.forEach(slide => {
+            slide.classList.remove("active");
+        });
 
-function previousSlide() {
+        slides[index].classList.add("active");
 
-    showSlide(slideIndex - 1);
+        if (slideCurrent) {
+            slideCurrent.textContent =
+                String(index + 1).padStart(2, "0");
+        }
 
-}
-
-
-
-/* Start slideshow */
-
-function startSlideshow() {
-
-    clearInterval(slideshowTimer);
-
-    slideshowTimer =
-        setInterval(
-            nextSlide,
-            slideDuration
-        );
-
-}
-
+        resetProgress();
+    }
 
 
-/* Restart */
+    function nextSlide() {
 
-function restartSlideshow() {
+        currentSlide++;
 
-    startSlideshow();
+        if (currentSlide >= slides.length) {
+            currentSlide = 0;
+        }
 
-}
+        showSlide(currentSlide);
+    }
 
 
+    function resetProgress() {
 
-/* Preload images */
+        if (!slideProgress) return;
 
-slides.forEach(slide => {
+        slideProgress.style.transition = "none";
+        slideProgress.style.width = "0%";
 
-    const image =
-        slide.querySelector("img");
+        requestAnimationFrame(() => {
 
-    if (image) {
+            requestAnimationFrame(() => {
 
-        const preload =
-            new Image();
+                slideProgress.style.transition =
+                    `width ${slideDuration}ms linear`;
 
-        preload.src =
-            image.src;
+                slideProgress.style.width = "100%";
+
+            });
+
+        });
 
     }
 
-});
+
+    function startSlideshow() {
+
+        clearInterval(slideTimer);
+
+        slideTimer = setInterval(() => {
+            nextSlide();
+        }, slideDuration);
+
+    }
 
 
-
-showSlide(0);
-
-startSlideshow();
+    showSlide(0);
+    startSlideshow();
 
 
+    /* Pause when browser tab is hidden */
 
-/* Pause slideshow when tab isn't active */
-
-document.addEventListener(
-    "visibilitychange",
-    () => {
+    document.addEventListener("visibilitychange", () => {
 
         if (document.hidden) {
 
-            clearInterval(
-                slideshowTimer
-            );
+            clearInterval(slideTimer);
 
         } else {
 
             startSlideshow();
-
         }
 
-    }
-);
+    });
+
+}
 
 
-
-/* =====================================================
-   MOBILE SWIPE CONTROLS
-===================================================== */
-
-const hero =
-    document.querySelector(".hero");
-
-
-let touchStartX = 0;
-
-let touchEndX = 0;
-
-
-
-hero.addEventListener(
-    "touchstart",
-    event => {
-
-        touchStartX =
-            event.changedTouches[0].screenX;
-
-    },
-    { passive: true }
-);
-
-
-
-hero.addEventListener(
-    "touchend",
-    event => {
-
-        touchEndX =
-            event.changedTouches[0].screenX;
-
-
-        const distance =
-            touchEndX - touchStartX;
-
-
-        if (Math.abs(distance) > 50) {
-
-            if (distance < 0) {
-
-                nextSlide();
-
-            } else {
-
-                previousSlide();
-
-            }
-
-            restartSlideshow();
-
-        }
-
-    },
-    { passive: true }
-);
-
-
-
-/* =====================================================
-   KEYBOARD CONTROLS
-===================================================== */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (event.key === "ArrowRight") {
-
-            nextSlide();
-
-            restartSlideshow();
-
-        }
-
-
-        if (event.key === "ArrowLeft") {
-
-            previousSlide();
-
-            restartSlideshow();
-
-        }
-
-    }
-);
-
-
-
-/* =====================================================
+/* =========================================================
    COUNTDOWN
-===================================================== */
-
+========================================================= */
 
 /*
-   CHANGE THIS DATE AND TIME
-   WHEN YOU HAVE THE FINAL
-   WEDDING DATE.
+   Wedding date:
+   21 November 2026
+   11:00 AM Ghana time (GMT)
 */
 
-const weddingDate = new Date("2026-11-21T13:00:00+00:00").getTime();
-
-
+const weddingDate =
+    new Date("2026-11-21T11:00:00+00:00").getTime();
 
 function updateCountdown() {
 
-    const difference =
-        Math.max(
-            0,
-            weddingDate - Date.now()
+    const now = new Date().getTime();
+
+    const distance = weddingDate - now;
+
+    const days = document.getElementById("days");
+    const hours = document.getElementById("hours");
+    const minutes = document.getElementById("minutes");
+    const seconds = document.getElementById("seconds");
+
+
+    if (distance <= 0) {
+
+        if (days) days.textContent = "00";
+        if (hours) hours.textContent = "00";
+        if (minutes) minutes.textContent = "00";
+        if (seconds) seconds.textContent = "00";
+
+        return;
+    }
+
+
+    const dayValue =
+        Math.floor(distance / (1000 * 60 * 60 * 24));
+
+    const hourValue =
+        Math.floor(
+            (distance % (1000 * 60 * 60 * 24))
+            / (1000 * 60 * 60)
+        );
+
+    const minuteValue =
+        Math.floor(
+            (distance % (1000 * 60 * 60))
+            / (1000 * 60)
+        );
+
+    const secondValue =
+        Math.floor(
+            (distance % (1000 * 60))
+            / 1000
         );
 
 
-    const days =
-        Math.floor(
-            difference / 86400000
-        );
+    if (days) {
+        days.textContent =
+            String(dayValue).padStart(2, "0");
+    }
 
+    if (hours) {
+        hours.textContent =
+            String(hourValue).padStart(2, "0");
+    }
 
-    const hours =
-        Math.floor(
-            difference / 3600000
-        ) % 24;
+    if (minutes) {
+        minutes.textContent =
+            String(minuteValue).padStart(2, "0");
+    }
 
-
-    const minutes =
-        Math.floor(
-            difference / 60000
-        ) % 60;
-
-
-    const seconds =
-        Math.floor(
-            difference / 1000
-        ) % 60;
-
-
-
-    document.getElementById("days")
-        .textContent =
-        String(days).padStart(2, "0");
-
-
-    document.getElementById("hours")
-        .textContent =
-        String(hours).padStart(2, "0");
-
-
-    document.getElementById("minutes")
-        .textContent =
-        String(minutes).padStart(2, "0");
-
-
-    document.getElementById("seconds")
-        .textContent =
-        String(seconds).padStart(2, "0");
+    if (seconds) {
+        seconds.textContent =
+            String(secondValue).padStart(2, "0");
+    }
 
 }
 
 
 updateCountdown();
 
-
-setInterval(
-    updateCountdown,
-    1000
-);
+setInterval(updateCountdown, 1000);
 
 
-
-/* =====================================================
+/* =========================================================
    GALLERY LIGHTBOX
-===================================================== */
+========================================================= */
+
+const galleryImages =
+    document.querySelectorAll(".gallery-item img");
 
 const lightbox =
     document.getElementById("lightbox");
@@ -400,198 +229,359 @@ const lightbox =
 const lightboxImage =
     document.getElementById("lightboxImage");
 
+const lightboxClose =
+    document.getElementById("lightboxClose");
 
-const galleryItems =
-    document.querySelectorAll(".gallery-item");
+const lightboxPrev =
+    document.getElementById("lightboxPrev");
 
+const lightboxNext =
+    document.getElementById("lightboxNext");
 
-
-galleryItems.forEach(item => {
-
-    item.addEventListener(
-        "click",
-        () => {
-
-            lightboxImage.src =
-                item.dataset.image;
+let lightboxIndex = 0;
 
 
-            lightbox.classList.add(
-                "open"
-            );
+function openLightbox(index) {
 
+    if (!galleryImages.length) return;
 
-            lightbox.setAttribute(
-                "aria-hidden",
-                "false"
-            );
+    lightboxIndex = index;
 
+    lightboxImage.src =
+        galleryImages[lightboxIndex].src;
 
-            document.body.classList.add(
-                "no-scroll"
-            );
+    lightboxImage.alt =
+        galleryImages[lightboxIndex].alt;
 
-        }
-    );
+    lightbox.classList.add("active");
 
-});
-
+    document.body.style.overflow = "hidden";
+}
 
 
 function closeLightbox() {
 
-    lightbox.classList.remove(
-        "open"
+    lightbox.classList.remove("active");
+
+    document.body.style.overflow = "";
+}
+
+
+function nextLightboxImage() {
+
+    lightboxIndex++;
+
+    if (lightboxIndex >= galleryImages.length) {
+        lightboxIndex = 0;
+    }
+
+    lightboxImage.src =
+        galleryImages[lightboxIndex].src;
+
+    lightboxImage.alt =
+        galleryImages[lightboxIndex].alt;
+}
+
+
+function previousLightboxImage() {
+
+    lightboxIndex--;
+
+    if (lightboxIndex < 0) {
+        lightboxIndex = galleryImages.length - 1;
+    }
+
+    lightboxImage.src =
+        galleryImages[lightboxIndex].src;
+
+    lightboxImage.alt =
+        galleryImages[lightboxIndex].alt;
+}
+
+
+galleryImages.forEach((image, index) => {
+
+    image.addEventListener("click", () => {
+        openLightbox(index);
+    });
+
+});
+
+
+if (lightboxClose) {
+    lightboxClose.addEventListener(
+        "click",
+        closeLightbox
     );
+}
 
 
-    lightbox.setAttribute(
-        "aria-hidden",
-        "true"
+if (lightboxNext) {
+    lightboxNext.addEventListener(
+        "click",
+        nextLightboxImage
     );
+}
 
 
-    document.body.classList.remove(
-        "no-scroll"
+if (lightboxPrev) {
+    lightboxPrev.addEventListener(
+        "click",
+        previousLightboxImage
     );
+}
+
+
+if (lightbox) {
+
+    lightbox.addEventListener("click", event => {
+
+        if (event.target === lightbox) {
+            closeLightbox();
+        }
+
+    });
 
 }
 
 
+document.addEventListener("keydown", event => {
 
-document.getElementById(
-    "lightboxClose"
-).addEventListener(
-    "click",
-    closeLightbox
-);
-
-
-
-lightbox.addEventListener(
-    "click",
-    event => {
-
-        if (
-            event.target === lightbox
-        ) {
-
-            closeLightbox();
-
-        }
-
+    if (!lightbox.classList.contains("active")) {
+        return;
     }
-);
 
-
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key === "Escape"
-        ) {
-
-            closeLightbox();
-
-        }
-
+    if (event.key === "Escape") {
+        closeLightbox();
     }
-);
+
+    if (event.key === "ArrowRight") {
+        nextLightboxImage();
+    }
+
+    if (event.key === "ArrowLeft") {
+        previousLightboxImage();
+    }
+
+});
 
 
-
-/* =====================================================
-   RSVP → WHATSAPP
-===================================================== */
+/* =========================================================
+   RSVP
+========================================================= */
 
 const rsvpForm =
-    document.getElementById(
-        "rsvpForm"
-    );
+    document.getElementById("rsvpForm");
 
 
+if (rsvpForm) {
 
-rsvpForm.addEventListener(
-    "submit",
-    event => {
+    rsvpForm.addEventListener("submit", event => {
 
         event.preventDefault();
 
 
         const name =
-            document.getElementById(
-                "guestName"
-            ).value.trim();
+            document.getElementById("name").value.trim();
 
+        const phone =
+            document.getElementById("phone").value.trim();
 
-        const response =
-            document.getElementById(
-                "attendance"
-            ).value;
+        const guests =
+            document.getElementById("guests").value;
 
+        const attendance =
+            document.getElementById("attendance").value;
 
         const message =
-            document.getElementById(
-                "guestMessage"
-            ).value.trim()
-            || "No message";
+            document.getElementById("message").value.trim();
 
 
         /*
-           IMPORTANT:
+           CHANGE THIS NUMBER.
 
-           Replace this number with
-           the couple's WhatsApp number.
+           Ghana format:
+           233XXXXXXXXX
 
            Example:
-
            233241234567
-
-           Do not use +.
         */
 
-        const number =
-            "233545958975";
+        const number = "233545958975";
 
 
-        const text =
-`Wedding RSVP
+        const whatsappMessage =
+            `Hello Enoch & Priscilla,
+
+I would like to RSVP for your wedding.
 
 Name: ${name}
+Phone: ${phone}
+Number of Guests: ${guests}
+Attendance: ${attendance}
+Message: ${message || "No additional message."}
 
-Response: ${response}
-
-Message: ${message}`;
+Wedding Date: 21 November 2026`;
 
 
-        document.getElementById(
-            "formMessage"
-        ).textContent =
-            "Opening WhatsApp…";
+        const whatsappURL =
+            `https://wa.me/${number}?text=${encodeURIComponent(
+                whatsappMessage
+            )}`;
 
 
         window.open(
-            `https://wa.me/${number}?text=${encodeURIComponent(text)}`,
+            whatsappURL,
             "_blank"
         );
 
-    }
-);
+    });
+
+}
 
 
+/* =========================================================
+   SHARE INVITATION
+========================================================= */
 
-/* =====================================================
-   WHATSAPP SHARE
-===================================================== */
-
-const shareText =
-    "You are warmly invited to celebrate Emmanuel & Shirley on 26 September 2026. We would love to have you with us.";
+const shareButton =
+    document.getElementById("shareButton");
 
 
-document.getElementById(
-    "whatsappShare"
-).href =
-    "https://wa.me/?text=" +
-    encodeURIComponent(shareText);
+if (shareButton) {
+
+    shareButton.addEventListener("click", async () => {
+
+        const shareData = {
+
+            title: "Enoch & Priscilla",
+
+            text:
+                "You are invited to celebrate the wedding of Enoch & Priscilla on 21 November 2026.",
+
+            url: window.location.href
+
+        };
+
+
+        if (navigator.share) {
+
+            try {
+
+                await navigator.share(shareData);
+
+            } catch (error) {
+
+                console.log("Share cancelled.");
+
+            }
+
+        } else {
+
+            try {
+
+                await navigator.clipboard.writeText(
+                    window.location.href
+                );
+
+                alert(
+                    "Invitation link copied! You can now share it with your family and friends."
+                );
+
+            } catch (error) {
+
+                alert(
+                    "Copy the website link from your browser and share it with your guests."
+                );
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   IMAGE PRELOADING
+========================================================= */
+
+const heroImages = [
+    "images/photo1.jpg",
+    "images/photo2.jpg",
+    "images/photo3.jpg",
+    "images/photo4.jpg",
+    "images/photo5.jpg"
+];
+
+
+heroImages.forEach(src => {
+
+    const image = new Image();
+
+    image.src = src;
+
+});
+
+
+/* =========================================================
+   TOUCH SWIPE FOR HERO
+========================================================= */
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+const hero =
+    document.querySelector(".hero");
+
+
+if (hero && slides.length > 1) {
+
+    hero.addEventListener("touchstart", event => {
+
+        touchStartX =
+            event.changedTouches[0].screenX;
+
+    });
+
+
+    hero.addEventListener("touchend", event => {
+
+        touchEndX =
+            event.changedTouches[0].screenX;
+
+        const difference =
+            touchEndX - touchStartX;
+
+
+        if (Math.abs(difference) < 50) {
+            return;
+        }
+
+
+        if (difference < 0) {
+
+            currentSlide++;
+
+            if (currentSlide >= slides.length) {
+                currentSlide = 0;
+            }
+
+        } else {
+
+            currentSlide--;
+
+            if (currentSlide < 0) {
+                currentSlide = slides.length - 1;
+            }
+
+        }
+
+
+        showSlide(currentSlide);
+        startSlideshow();
+
+    });
+
+}
