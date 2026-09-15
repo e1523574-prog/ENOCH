@@ -3,3 +3,4 @@
 ![image alt] (https://github.com/e1523574-prog/ENOCH/blob/cce7c5676259e27ee9d276abd5e29b7ed4ec3d9b/en3.jpg)
 ![image alt] (https://github.com/e1523574-prog/ENOCH/blob/0bcb55e1c0f8374e6fe0e19f72de4ac79cfd818c/en4.jpg)
 ![image alt] (https://github.com/e1523574-prog/ENOCH/blob/23177bab5048ac50f6f5aa87339915d8d7a81e77/en5.jpg)
+![image alt] (https://github.com/e1523574-prog/ENOCH/blob/9c58e9d68c2d5e145b1b624c0190731dfe338ec7/logo-2.png)
